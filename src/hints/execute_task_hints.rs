@@ -15,7 +15,7 @@ use cairo_vm::vm::runners::builtin_runner::{OutputBuiltinRunner, OutputBuiltinSt
 use cairo_vm::vm::runners::cairo_pie::{CairoPie, StrippedProgram};
 use cairo_vm::vm::vm_core::VirtualMachine;
 use cairo_vm::{any_box, Felt252};
-use starknet_crypto::FieldElement;
+use starknet_crypto::Felt;
 
 use crate::hints::fact_topologies::{get_task_fact_topology, FactTopology};
 use crate::hints::load_cairo_pie::load_cairo_pie;
@@ -51,7 +51,7 @@ pub fn allocate_program_data_segment(
     Ok(())
 }
 
-fn field_element_to_felt(field_element: FieldElement) -> Felt252 {
+fn field_element_to_felt(field_element: Felt) -> Felt252 {
     let bytes = field_element.to_bytes_be();
     Felt252::from_bytes_be(&bytes)
 }

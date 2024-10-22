@@ -1,4 +1,6 @@
 use std::error::Error;
+use std::fs;
+use std::path::Path;
 
 use cairo_vm::cairo_run::{cairo_run_program_with_initial_scope, CairoRunConfig};
 use cairo_vm::types::exec_scope::ExecutionScopes;
@@ -25,11 +27,12 @@ fn cairo_run_bootloader_in_proof_mode(
         entrypoint: "main",
         trace_enabled: false,
         relocate_mem: false,
-        layout: LayoutName::starknet_with_keccak,
+        layout: LayoutName::all_cairo,
         proof_mode: true,
         secure_run: None,
         disable_trace_padding: false,
         allow_missing_builtins: None,
+        dynamic_layout_params: None,
     };
 
     // Build the bootloader input
@@ -46,6 +49,7 @@ fn cairo_run_bootloader_in_proof_mode(
         },
         packed_outputs: vec![PackedOutput::Plain(vec![]); n_tasks],
     };
+    
 
     // Note: the method used to set the bootloader input depends on
     // https://github.com/lambdaclass/cairo-vm/pull/1772 and may change depending on review.
@@ -63,9 +67,10 @@ fn cairo_run_bootloader_in_proof_mode(
 
 fn main() -> Result<(), Box<dyn Error>> {
     let bootloader_program = load_bootloader()?;
-    let fibonacci_program = include_bytes!("fibonacci.json");
+    // let fibonacci_program = include_bytes!("fibonacci.json");
+    let pie = include_bytes!("../173404.zip");
 
-    let tasks = make_bootloader_tasks(&[fibonacci_program], &[])?;
+    let tasks = make_bootloader_tasks(&[], &[pie])?;
 
     let mut runner = cairo_run_bootloader_in_proof_mode(&bootloader_program, tasks)?;
 

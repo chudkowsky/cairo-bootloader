@@ -99,6 +99,10 @@ pub fn set_ap_to_zero(vm: &mut VirtualMachine) -> Result<(), HintError> {
     insert_value_into_ap(vm, Felt252::from(0))?;
     Ok(())
 }
+pub fn set_ap_to_one(vm: &mut VirtualMachine) -> Result<(), HintError> {
+    insert_value_into_ap(vm, Felt252::from(1))?;
+    Ok(())
+}
 
 /// Implements
 /// from starkware.cairo.bootloaders.simple_bootloader.objects import Task

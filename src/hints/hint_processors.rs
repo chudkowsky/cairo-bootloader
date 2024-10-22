@@ -34,6 +34,9 @@ use crate::hints::simple_bootloader_hints::{
     set_tasks_variable,
 };
 
+use super::bootloader_hints::bootloader_runner_output_segment;
+use super::simple_bootloader_hints::set_ap_to_one;
+
 /// A hint processor that can only execute the hints defined in this library.
 /// For large projects, you may want to compose a hint processor from multiple parts
 /// (ex: Starknet OS, bootloader and Cairo VM). This hint processor is as minimal as possible
@@ -84,7 +87,10 @@ impl HintProcessorLogic for MinimalBootloaderHintProcessor {
                 guess_pre_image_of_subtasks_output_hash(vm, exec_scopes, ids_data, ap_tracking)
             }
             BOOTLOADER_PREPARE_SIMPLE_BOOTLOADER_OUTPUT_SEGMENT => {
-                prepare_simple_bootloader_output_segment(vm, exec_scopes, ids_data, ap_tracking)
+                prepare_simple_bootloader_output_segment(exec_scopes)
+            }
+            BOOTLOADER_RUNNER_OUTPUT_SEGMENT => {
+                bootloader_runner_output_segment(vm, ids_data, ap_tracking, exec_scopes)
             }
             BOOTLOADER_COMPUTE_FACT_TOPOLOGIES => {
                 compute_and_configure_fact_topologies(vm, exec_scopes)
@@ -104,6 +110,7 @@ impl HintProcessorLogic for MinimalBootloaderHintProcessor {
                 set_current_task(vm, exec_scopes, ids_data, ap_tracking)
             }
             SIMPLE_BOOTLOADER_ZERO => set_ap_to_zero(vm),
+            SIMPLE_BOOTLOADER_USE_POSEIDON => set_ap_to_one(vm),
             EXECUTE_TASK_ALLOCATE_PROGRAM_DATA_SEGMENT => {
                 allocate_program_data_segment(vm, exec_scopes, ids_data, ap_tracking)
             }
