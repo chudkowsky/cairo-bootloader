@@ -1,3 +1,4 @@
+use core::panic;
 use std::any::Any;
 use std::collections::HashMap;
 use std::rc::Rc;
@@ -69,14 +70,33 @@ impl HintProcessorLogic for MinimalBootloaderHintProcessor {
         let ap_tracking = &hint_data.ap_tracking;
 
         match hint_data.code.as_str() {
-            BOOTLOADER_RESTORE_BOOTLOADER_OUTPUT => restore_bootloader_output(vm, exec_scopes),
+            BOOTLOADER_PREPARE_SIMPLE_BOOTLOADER_OUTPUT_SEGMENT => {
+                println!("1/2 of src/starkware/cairo/bootloaders/bootloader/bootloader.cairo");
+                prepare_simple_bootloader_output_segment(exec_scopes)
+            }
+            BOOTLOADER_COMPUTE_FACT_TOPOLOGIES => {
+                println!("2/2 of src/starkware/cairo/bootloaders/bootloader/bootloader.cairo");
+
+                compute_and_configure_fact_topologies(vm, exec_scopes)
+            }
+            BOOTLOADER_RUNNER_OUTPUT_SEGMENT => {
+                println!("1/4 of src/starkware/cairo/bootloaders/bootloader/run_bootloader.cairo");
+                bootloader_runner_output_segment(vm, ids_data, ap_tracking, exec_scopes)
+            }
             BOOTLOADER_PREPARE_SIMPLE_BOOTLOADER_INPUT => {
+                println!("2/4 of src/starkware/cairo/bootloaders/bootloader/run_bootloader.cairo");
                 prepare_simple_bootloader_input(exec_scopes)
             }
+            BOOTLOADER_RESTORE_BOOTLOADER_OUTPUT => {
+                println!("3/4 of src/starkware/cairo/bootloaders/bootloader/run_bootloader.cairo");
+                restore_bootloader_output(vm, exec_scopes)
+            }
             BOOTLOADER_LOAD_BOOTLOADER_CONFIG => {
+                println!("4/4 of src/starkware/cairo/bootloaders/bootloader/run_bootloader.cairo");
                 load_bootloader_config(vm, exec_scopes, ids_data, ap_tracking)
             }
             BOOTLOADER_ENTER_PACKED_OUTPUT_SCOPE => {
+                println!("1/1 of parse_tasks of src/starkware/cairo/bootloaders/bootloader/bootloader.cairo");
                 enter_packed_output_scope(vm, exec_scopes, ids_data, ap_tracking)
             }
             BOOTLOADER_SAVE_OUTPUT_POINTER => {
@@ -86,15 +106,6 @@ impl HintProcessorLogic for MinimalBootloaderHintProcessor {
             BOOTLOADER_GUESS_PRE_IMAGE_OF_SUBTASKS_OUTPUT_HASH => {
                 guess_pre_image_of_subtasks_output_hash(vm, exec_scopes, ids_data, ap_tracking)
             }
-            BOOTLOADER_PREPARE_SIMPLE_BOOTLOADER_OUTPUT_SEGMENT => {
-                prepare_simple_bootloader_output_segment(exec_scopes)
-            }
-            BOOTLOADER_RUNNER_OUTPUT_SEGMENT => {
-                bootloader_runner_output_segment(vm, ids_data, ap_tracking, exec_scopes)
-            }
-            BOOTLOADER_COMPUTE_FACT_TOPOLOGIES => {
-                compute_and_configure_fact_topologies(vm, exec_scopes)
-            }
             BOOTLOADER_SET_PACKED_OUTPUT_TO_SUBTASKS => set_packed_output_to_subtasks(exec_scopes),
             BOOTLOADER_IMPORT_PACKED_OUTPUT_SCHEMAS => import_packed_output_schemas(),
             BOOTLOADER_IS_PLAIN_PACKED_OUTPUT => is_plain_packed_output(vm, exec_scopes),
@@ -102,15 +113,23 @@ impl HintProcessorLogic for MinimalBootloaderHintProcessor {
                 assert_is_composite_packed_output(exec_scopes)
             }
             SIMPLE_BOOTLOADER_PREPARE_TASK_RANGE_CHECKS => {
+                println!("1/1 of src/starkware/cairo/bootloaders/simple_bootloader/simple_bootloader.cairo");
                 prepare_task_range_checks(vm, exec_scopes, ids_data, ap_tracking)
             }
-            SIMPLE_BOOTLOADER_SET_TASKS_VARIABLE => set_tasks_variable(exec_scopes),
+            SIMPLE_BOOTLOADER_SET_TASKS_VARIABLE => {
+                println!("2/2 of src/starkware/cairo/bootloaders/simple_bootloader/simple_bootloader.cairo");
+                set_tasks_variable(exec_scopes)
+            }
             SIMPLE_BOOTLOADER_DIVIDE_NUM_BY_2 => divide_num_by_2(vm, ids_data, ap_tracking),
             SIMPLE_BOOTLOADER_SET_CURRENT_TASK => {
                 set_current_task(vm, exec_scopes, ids_data, ap_tracking)
             }
             SIMPLE_BOOTLOADER_ZERO => set_ap_to_zero(vm),
-            SIMPLE_BOOTLOADER_USE_POSEIDON => set_ap_to_one(vm),
+            SIMPLE_BOOTLOADER_USE_POSEIDON => {
+                println!("1/1 of src/starkware/cairo/bootloaders/simple_bootloader/run_simple_bootloader.cairo");
+                // set_ap_to_one(vm)
+                set_ap_to_zero(vm)
+            }
             EXECUTE_TASK_ALLOCATE_PROGRAM_DATA_SEGMENT => {
                 allocate_program_data_segment(vm, exec_scopes, ids_data, ap_tracking)
             }
@@ -184,6 +203,9 @@ impl HintProcessorLogic for BootloaderHintProcessor {
 
         let hint_data = hint_data.downcast_ref::<HintProcessorData>().unwrap();
         let hint_code = &hint_data.code;
+
+        panic!("unknown hint_code: {:?}", hint_code);
+
         Err(HintError::UnknownHint(hint_code.clone().into_boxed_str()))
     }
 

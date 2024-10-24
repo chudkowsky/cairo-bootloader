@@ -49,7 +49,6 @@ fn cairo_run_bootloader_in_proof_mode(
         },
         packed_outputs: vec![PackedOutput::Plain(vec![]); n_tasks],
     };
-    
 
     // Note: the method used to set the bootloader input depends on
     // https://github.com/lambdaclass/cairo-vm/pull/1772 and may change depending on review.
@@ -67,10 +66,10 @@ fn cairo_run_bootloader_in_proof_mode(
 
 fn main() -> Result<(), Box<dyn Error>> {
     let bootloader_program = load_bootloader()?;
-    // let fibonacci_program = include_bytes!("fibonacci.json");
-    let pie = include_bytes!("../173404.zip");
+    let fibonacci_program = include_bytes!("fibonacci.json");
+    // let pie = include_bytes!("../173404.zip");
 
-    let tasks = make_bootloader_tasks(&[], &[pie])?;
+    let tasks = make_bootloader_tasks(&[fibonacci_program], &[])?;
 
     let mut runner = cairo_run_bootloader_in_proof_mode(&bootloader_program, tasks)?;
 

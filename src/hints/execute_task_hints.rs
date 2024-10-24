@@ -176,7 +176,7 @@ pub fn validate_hash(
 }
 
 /// List of all builtins in the order used by the bootloader.
-const ALL_BUILTINS: [BuiltinName; 8] = [
+const ALL_BUILTINS: [BuiltinName; 11] = [
     BuiltinName::output,
     BuiltinName::pedersen,
     BuiltinName::range_check,
@@ -185,6 +185,9 @@ const ALL_BUILTINS: [BuiltinName; 8] = [
     BuiltinName::ec_op,
     BuiltinName::keccak,
     BuiltinName::poseidon,
+    BuiltinName::range_check96,
+    BuiltinName::add_mod,
+    BuiltinName::mul_mod,
 ];
 
 fn check_cairo_pie_builtin_usage(

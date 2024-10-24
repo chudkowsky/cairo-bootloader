@@ -112,7 +112,8 @@ task = simple_bootloader_input.tasks[task_id].load_task()";
 // Appears as nondet %{ 0 %} in the code.
 pub const SIMPLE_BOOTLOADER_ZERO: &str = "memory[ap] = to_felt_or_relocatable(0)";
 
-pub const SIMPLE_BOOTLOADER_USE_POSEIDON: &str = "memory[ap] = to_felt_or_relocatable(1 if task.use_poseidon else 0)";
+pub const SIMPLE_BOOTLOADER_USE_POSEIDON: &str =
+    "memory[ap] = to_felt_or_relocatable(1 if task.use_poseidon else 0)";
 pub const EXECUTE_TASK_ALLOCATE_PROGRAM_DATA_SEGMENT: &str =
     "ids.program_data_ptr = program_data_base = segments.add()";
 
