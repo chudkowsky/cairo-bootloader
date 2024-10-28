@@ -107,7 +107,7 @@ impl FileWriter {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let bootloader_program = load_bootloader()?;
-    let fibonacci_program = include_bytes!("aa.json");
+    let fibonacci_program = include_bytes!("echo.json");
     // let pie = include_bytes!("../173404.zip");
 
     let tasks = make_bootloader_tasks(&[fibonacci_program], &[])?;
