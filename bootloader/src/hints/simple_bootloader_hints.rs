@@ -99,10 +99,6 @@ pub fn set_ap_to_zero(vm: &mut VirtualMachine) -> Result<(), HintError> {
     insert_value_into_ap(vm, Felt252::from(0))?;
     Ok(())
 }
-pub fn set_ap_to_one(vm: &mut VirtualMachine) -> Result<(), HintError> {
-    insert_value_into_ap(vm, Felt252::from(1))?;
-    Ok(())
-}
 
 /// Implements
 /// from starkware.cairo.bootloaders.simple_bootloader.objects import Task
@@ -163,7 +159,7 @@ mod tests {
     #[fixture]
     fn fibonacci() -> Program {
         let program_content =
-            include_bytes!("../../examples/fibonacci.json")
+            include_bytes!("../../../examples/starknet_with_keccak.json")
                 .to_vec();
 
         Program::from_bytes(&program_content, Some("main"))

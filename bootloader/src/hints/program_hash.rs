@@ -24,11 +24,6 @@ pub enum ProgramHashError {
 
     #[error("Invalid program data: data contains relocatable(s)")]
     InvalidProgramData,
-
-    /// Conversion from Felt252 to Felt failed. This is unlikely to happen
-    /// unless the implementation of Felt252 changes and this code is not updated properly.
-    #[error("Conversion from Felt252 to Felt failed")]
-    Felt252ToFieldElementConversionFailed,
 }
 
 /// Computes a hash chain over the data, in the following order:

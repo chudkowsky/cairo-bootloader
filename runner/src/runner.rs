@@ -1,42 +1,40 @@
-use std::error::Error;
-use std::fs;
-use std::path::Path;
 use std::fs::File;
-use std::path::{PathBuf};
+use std::path::Path;
+use std::path::PathBuf;
 
 use bincode::error::EncodeError;
 use cairo_vm::air_private_input::AirPrivateInput;
 use cairo_vm::air_public_input::{PublicInput, PublicInputError};
-use cairo_vm::cairo_run::{cairo_run_program_with_initial_scope, write_encoded_memory, write_encoded_trace, CairoRunConfig, EncodeTraceError};
+use cairo_vm::cairo_run::{
+    cairo_run_program_with_initial_scope, write_encoded_memory, write_encoded_trace,
+    CairoRunConfig, EncodeTraceError,
+};
 use cairo_vm::types::exec_scope::ExecutionScopes;
 use cairo_vm::types::layout_name::LayoutName;
 use cairo_vm::types::program::Program;
 use cairo_vm::vm::errors::cairo_run_errors::CairoRunError;
 use cairo_vm::vm::errors::trace_errors::TraceError;
 use cairo_vm::vm::runners::cairo_runner::CairoRunner;
-use cairo_vm::vm::vm_core::VirtualMachine;
 use cairo_vm::Felt252;
-
-use cairo_bootloader::bootloaders::load_bootloader;
-use cairo_bootloader::tasks::make_bootloader_tasks;
-use cairo_bootloader::{
+use bootloader::{
     insert_bootloader_input, BootloaderConfig, BootloaderHintProcessor, BootloaderInput,
     PackedOutput, SimpleBootloaderInput, TaskSpec,
 };
 use serde::Serialize;
 use thiserror::Error;
 
-fn cairo_run_bootloader_in_proof_mode(
+pub fn cairo_run_bootloader_in_proof_mode(
     bootloader_program: &Program,
     tasks: Vec<TaskSpec>,
+    layout: LayoutName,
 ) -> Result<CairoRunner, CairoRunError> {
     let mut hint_processor = BootloaderHintProcessor::new();
 
     let cairo_run_config = CairoRunConfig {
         entrypoint: "main",
-        trace_enabled: false,
-        relocate_mem: false,
-        layout: LayoutName::all_cairo,
+        trace_enabled: true,
+        relocate_mem: true,
+        layout: layout,
         proof_mode: true,
         secure_run: None,
         disable_trace_padding: false,
@@ -73,24 +71,6 @@ fn cairo_run_bootloader_in_proof_mode(
         exec_scopes,
     )
 }
-
-fn main() -> Result<(), Box<dyn Error>> {
-    let bootloader_program = load_bootloader()?;
-    let fibonacci_program = include_bytes!("fibonacci.json");
-    // let pie = include_bytes!("../173404.zip");
-
-    let tasks = make_bootloader_tasks(&[fibonacci_program], &[])?;
-
-    let mut runner = cairo_run_bootloader_in_proof_mode(&bootloader_program, tasks)?;
-
-    let mut output_buffer = "Program Output:\n".to_string();
-    runner.vm.write_output(&mut output_buffer)?;
-    extract_execution_artifacts(runner)?;
-    print!("{output_buffer}");
-
-    Ok(())
-}
-
 
 pub struct ExecutionArtifacts<'a> {
     pub public_input: PublicInput<'a>,
@@ -138,9 +118,7 @@ impl bincode::enc::write::Writer for MemWriter {
 ///
 /// * `cairo_runner` Cairo runner object.
 /// * `vm`: Cairo VM object.
-pub fn extract_execution_artifacts(
-    cairo_runner: CairoRunner,
-) -> Result<(), ExecutionError> {
+pub fn extract_execution_artifacts(cairo_runner: CairoRunner) -> Result<(), ExecutionError> {
     let memory = &cairo_runner.relocated_memory;
     let trace = cairo_runner
         .relocated_trace
@@ -165,8 +143,6 @@ pub fn extract_execution_artifacts(
     let public_input_file = tmp_dir_path.join("public_input.json");
     let private_input_file = tmp_dir_path.join("private_input.json");
     let memory_file = tmp_dir_path.join("memory.bin");
-    let prover_config_file = tmp_dir_path.join("prover_config_file.json");
-    let prover_parameter_file = tmp_dir_path.join("parameters.json");
     let trace_file = tmp_dir_path.join("trace.bin");
     write_json_to_file(public_input, &public_input_file).unwrap();
     let private_input_serializable = private_input.to_serializable(
@@ -179,8 +155,6 @@ pub fn extract_execution_artifacts(
     std::fs::write(&trace_file, trace_raw).unwrap();
     Ok(())
 }
-
-
 
 pub fn write_json_to_file<T: Serialize, P: AsRef<Path>>(
     obj: T,

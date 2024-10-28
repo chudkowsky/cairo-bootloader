@@ -1,9 +1,7 @@
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use std::fs::File;
 use std::io::{BufReader, Write};
 use std::path::PathBuf;
-use std::str::FromStr;
 
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -23,15 +21,8 @@ struct Stark {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Template {
     field: String,
-    channel_hash: String,
-    commitment_hash: String,
-    n_verifier_friendly_commitment_layers: u32,
-    pow_hash: String,
-    statement: Value,
     stark: Stark,
     use_extension_field: bool,
-    verifier_friendly_channel_updates: bool,
-    verifier_friendly_commitment_hash: String,
 }
 
 impl Template {
@@ -75,11 +66,6 @@ impl core::default::Default for Template {
     fn default() -> Self {
         Template {
             field: "PrimeField0".to_string(),
-            channel_hash: "poseidon3".to_string(),
-            commitment_hash: "blake256_masked160_lsb".to_string(),
-            n_verifier_friendly_commitment_layers: 9999,
-            pow_hash: "keccak256".to_string(),
-            statement: serde_json::json!({ "page_hash": "pedersen" }),
             stark: Stark {
                 fri: StarkFri {
                     fri_step_list: vec![0, 4, 4, 4],
@@ -90,8 +76,6 @@ impl core::default::Default for Template {
                 log_n_cosets: 3,
             },
             use_extension_field: false,
-            verifier_friendly_channel_updates: true,
-            verifier_friendly_commitment_hash: "poseidon3".to_string(),
         }
     }
 }
@@ -115,9 +99,3 @@ impl ProgramPublicInputAsNSteps {
         steps
     }
 }
-#[test]
-fn test_config() {
-    let temp = Template::generate_from_public_input_file(&PathBuf::from_str("/home/mateuszchudkowski/dev/cairo0-playground/proof/fibonacci_public_input.json").unwrap(), None,None).save_to_file(&PathBuf::from_str("/home/mateuszchudkowski/dev/cairo0-playground/proof/temp.json").unwrap());
-
-}
-pub fn main(){}

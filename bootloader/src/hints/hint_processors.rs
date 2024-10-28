@@ -36,7 +36,7 @@ use crate::hints::simple_bootloader_hints::{
 };
 
 use super::bootloader_hints::bootloader_runner_output_segment;
-use super::simple_bootloader_hints::set_ap_to_one;
+// use super::simple_bootloader_hints::set_ap_to_one;
 
 /// A hint processor that can only execute the hints defined in this library.
 /// For large projects, you may want to compose a hint processor from multiple parts
@@ -206,7 +206,7 @@ impl HintProcessorLogic for BootloaderHintProcessor {
 
         panic!("unknown hint_code: {:?}", hint_code);
 
-        Err(HintError::UnknownHint(hint_code.clone().into_boxed_str()))
+        // Err(HintError::UnknownHint(hint_code.clone().into_boxed_str()))
     }
 
     fn execute_hint_extensive(

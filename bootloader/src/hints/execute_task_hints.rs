@@ -551,7 +551,7 @@ mod tests {
     #[fixture]
     fn fibonacci() -> Program {
         let program_content =
-            include_bytes!("../../examples/fibonacci.json")
+            include_bytes!("../../../examples/starknet_with_keccak.json")
                 .to_vec();
 
         Program::from_bytes(&program_content, Some("main"))
