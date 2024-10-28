@@ -163,7 +163,7 @@ mod tests {
     #[fixture]
     fn fibonacci() -> Program {
         let program_content =
-            include_bytes!("../../dependencies/test-programs/cairo0/fibonacci/fibonacci.json")
+            include_bytes!("../../examples/fibonacci.json")
                 .to_vec();
 
         Program::from_bytes(&program_content, Some("main"))

@@ -501,10 +501,7 @@ mod tests {
 
         exec_scopes.insert_value(vars::BOOTLOADER_INPUT, bootloader_input);
         prepare_simple_bootloader_output_segment(
-            &mut vm,
             &mut exec_scopes,
-            &ids_data,
-            &ap_tracking,
         )
         .expect("Hint failed unexpectedly");
 
@@ -540,10 +537,7 @@ mod tests {
         let ap_tracking = ApTracking::default();
 
         let result = prepare_simple_bootloader_output_segment(
-            &mut vm,
             &mut exec_scopes,
-            &ids_data,
-            &ap_tracking,
         );
         let hint_error =
             result.expect_err("Hint should fail, the bootloader input variable is not set");
